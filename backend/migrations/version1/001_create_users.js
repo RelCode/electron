@@ -13,6 +13,7 @@ module.exports = (db) => {
                         userID INTEGER PRIMARY KEY,
                         firstName TEXT NOT NULL,
                         lastName TEXT NOT NULL,
+                        active TEXT CHECK (active IN ('ACTIVE','INACTIVE')) NOT NULL DEFAULT 'ACTIVE',
                         timeCreated REAL
                     );`, (err) => {
                         if(err) {

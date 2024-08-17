@@ -16,7 +16,7 @@ const AuthScreen = ({ setCookie }) => {
             showMessage("Input Password");
         }else{
             setLoggingIn(true);
-            await axios.post(`${process.env.REACT_APP_API_ENDPOINT}auth`,{
+            await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/auth`,{
                 username: username,
                 password: password
             }).then(({data}) => {

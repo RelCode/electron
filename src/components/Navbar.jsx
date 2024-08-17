@@ -33,7 +33,7 @@ const NavButton = styled(Button)`
   margin-left: ${({ theme }) => theme.spacing(2)};
 `;
 
-const Navbar = ({ cookies, removeCookie, Link }) => {
+const Navbar = ({ cookies, removeCookie }) => {
     let userData = null;
     if (cookies?.sessionToken) {
         userData = jwtDecode(cookies.sessionToken);

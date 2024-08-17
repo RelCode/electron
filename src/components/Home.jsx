@@ -4,7 +4,7 @@ import './../assets/css/home.css';
 
 const Home = () => {
     return (
-        <div className="home-container">
+        <div className="component home-container">
             <Fab href="/users" variant="extended">
                 Manage Users
             </Fab>

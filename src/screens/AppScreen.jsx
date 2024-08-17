@@ -5,10 +5,11 @@ import { Navbar, Home, ViewUsers, CreateUsers } from './../components';
 const AppScreen = ({ cookies, removeCookie }) => {
     return (
         <Router>
-            <Navbar cookies={cookies} removeCookie={removeCookie} Link={Link}/>
+            <Navbar cookies={cookies} removeCookie={removeCookie}/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
                 <Route path="/users" element={<ViewUsers/>}/>
+                <Route path="/add-user" element={<CreateUsers/>} />
             </Routes>
         </Router>
     )
