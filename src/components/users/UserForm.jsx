@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Button, Container, Box, Typography, Grid, TextField, Select } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Button, Container, Box, Typography, Grid, TextField, Select, MenuItem } from "@mui/material";
 import { useQuery } from "react-query";
 import axios from "axios";
+import { useCookies } from "react-cookie";
+import { jwtDecode } from "jwt-decode";
 import './../../assets/css/userForm.css';
 
 const fetchUserTypes = async () => {
@@ -10,6 +12,8 @@ const fetchUserTypes = async () => {
 }
 
 const UserForm = ({ type }) => {
+    const [cookies] = useCookies(['sessionToken']);
+    const [user, setUser] = useState({});
     const { data, isLoading, error } = useQuery('userTypes', fetchUserTypes, {
         initialData: () => {
             return {
@@ -24,18 +28,81 @@ const UserForm = ({ type }) => {
         firstName: '',
         lastName: '',
         userName: '',
-        userType: '',
+        userType: 0,
         password: '',
         confirm: ''
     });
+    const [message, setMessage] = useState(null);
+    const [status, setStatus] = useState('error');
 
-    const handleSubmit = (e) => {
+    const generateSelectItems = () => {
+        const types = data.types;
+        let options = [<MenuItem value={0} key={0}>Select User Type</MenuItem>];
+        if(Object.values(user).length > 0){
+            types.map((type, index) => {
+                //users with more privileges have lower numerical typeID. e.g) super admin has an ID of 1 and Operator = 4. therefore minus typeIDs will only equal 0 or less for lesser privileges
+                if ((user.typeID - type.typeID) >= 0 && user.typeID > 1) {
+                    return;
+                }
+                options.push(<MenuItem value={type.typeID} key={index + 1}>{type.typeName.charAt(0).toUpperCase()}{(type.typeName).substring(1)}</MenuItem>);
+            });
+        }
+        return options;
+    }
+
+    const handleSubmit = async (e) => {
+        // console.log(formValues);
         e.preventDefault();
         // Handle form submission
+        if(formValues.firstName === ""){
+            showMessage("Provide First Name");
+        }else if(formValues.lastName === ""){
+            showMessage("Provide Last Name");
+        }else if (formValues.userName === "") {
+            showMessage("Provide User Name");
+        }else if (isNaN(formValues.userType) || formValues.userType < 1) {
+            showMessage("Select a Valid User Type");
+        } else if (formValues.password === "") {
+            showMessage("Provide a Secure Password");
+        } else if (formValues.confirm === "") {
+            showMessage("Repeat the Provided Password");
+        } else if (formValues.password.toLowerCase() !== formValues.confirm.toLowerCase()) {
+            showMessage("Passwords Provided Should Match");
+        }else{
+            await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/users/create`, {
+                payload: formValues
+            }, {
+                headers: {
+                    Authorization: `Bearer ${cookies?.sessionToken}`
+                }
+            }).then(response => {
+                console.log('RES:: ',response)
+            }).catch(err => {
+                console.log('ERR:: ', err);
+            })
+        }
     };
+
+    const showMessage = (msg) => {
+        setMessage(msg);
+        setTimeout(() => {
+            setMessage(null);
+        }, 3000);
+    }
+
+    const decodeToken = () => {
+        const userData = jwtDecode(cookies?.sessionToken);
+        setUser(userData);
+    }
+    useEffect(() => {
+        decodeToken();
+    },[]);
     return (
         <>
-            <Container maxWidth="sm" className="shadow-container">
+            <Container maxWidth="sm" sx={{ ml: {
+                sm: 0,
+                md: 'auto'
+            } }} className="shadow-container">
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         Create User
@@ -43,7 +110,7 @@ const UserForm = ({ type }) => {
                     <form onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
                             <Grid item container xs={12}>
-                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
+                                <Grid item xs={12} sm={6} sx={{ pr: { sm: 1 } }}>
                                     <TextField
                                         fullWidth
                                         label="First Name"
@@ -53,9 +120,9 @@ const UserForm = ({ type }) => {
                                         type="text"
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6} sx={{
-                                    mt: { xs: 2, md: 0 },
-                                    pl: { md: 1 }
+                                <Grid item xs={12} sm={6} sx={{
+                                    mt: { xs: 2, sm: 0 },
+                                    pl: { sm: 1 }
                                 }}>
                                     <TextField
                                         fullWidth
@@ -68,7 +135,7 @@ const UserForm = ({ type }) => {
                                 </Grid>
                             </Grid>
                             <Grid item container xs={12}>
-                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
+                                <Grid item xs={12} sm={6} sx={{ pr: { sm: 1 } }}>
                                     <TextField
                                         fullWidth
                                         label="Username"
@@ -76,26 +143,28 @@ const UserForm = ({ type }) => {
                                         value={formValues.userName}
                                         onChange={(e) => setFormValues({ ...formValues, userName: e.target.value })}
                                         type="text"
-                                        required
+                                        
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6} sx={{
-                                    mt: { xs: 2, md: 0 },
-                                    pl: { md: 1 }
+                                <Grid item xs={12} sm={6} sx={{
+                                    mt: { xs: 2, sm: 0 },
+                                    pl: { sm: 1 }
                                 }}>
-                                    <TextField
+                                    <Select
                                         fullWidth
                                         label="Select User Type"
                                         name="password"
-                                        value={formValues.password}
-                                        onChange={(e) => setFormValues({ ...formValues, password: e.target.value })}
-                                        type="text"
-                                        required
-                                    />
+                                        value={formValues.userType}
+                                        onChange={(e) => setFormValues({ ...formValues, userType: e.target.value })}
+                                    >
+                                        {
+                                            generateSelectItems()
+                                        }
+                                    </Select>
                                 </Grid>
                             </Grid>
                             <Grid item container xs={12}>
-                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
+                                <Grid item xs={12} sm={6} sx={{ pr: { sm: 1 } }}>
                                     <TextField
                                         fullWidth
                                         label="Create Password"
@@ -103,21 +172,21 @@ const UserForm = ({ type }) => {
                                         value={formValues.password}
                                         onChange={(e) => setFormValues({ ...formValues, password: e.target.value })}
                                         type="password"
-                                        required
+                                        
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6} sx={{ 
-                                    mt: { xs: 2, md: 0 },
-                                    pl: { md: 1 } 
+                                <Grid item xs={12} sm={6} sx={{ 
+                                    mt: { xs: 2, sm: 0 },
+                                    pl: { sm: 1 } 
                                     }}>
                                     <TextField
                                         fullWidth
                                         label="Confirm Password"
                                         name="password"
-                                        value={formValues.password}
-                                        onChange={(e) => setFormValues({ ...formValues, password: e.target.value })}
+                                        value={formValues.confirm}
+                                        onChange={(e) => setFormValues({ ...formValues, confirm: e.target.value })}
                                         type="password"
-                                        required
+                                        
                                     />
                                 </Grid>
                             </Grid>
@@ -134,6 +203,11 @@ const UserForm = ({ type }) => {
                         </Grid>
                     </form>
                 </Box>
+                <Container maxWidth="sm" className="warning-box">
+                    {
+                        message !== null ? <Typography className={ status }>{message}</Typography> : null
+                    }
+                </Container>
             </Container>
         </>
     )

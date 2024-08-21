@@ -6,11 +6,21 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex-direction: column;
 }
 
-.error-msg {
-    font-size: 18px;
-    padding: 10px;
-    color: yellow;
-    text-align: center;
+/* .login > .shadow-container > .warning-box {
+	position: relative;
+    width: 100%;
+    margin-top: 18px;
+    padding: 18px;
+	display: flex;
+	justify-content: center;
 }
+
+.login > .shadow-container > .warning-box > p {
+	position: absolute;
+	color: #D32F2F;
+	font-size: 22px;
+	text-align: center;
+} */

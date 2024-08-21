@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Box, Grid, TextField, Typography, Button, CircularProgress } from "@mui/material";
+import { Container, Box, Grid, TextField, Typography, Button, LinearProgress } from "@mui/material";
 import './../assets/css/authScreen.css';
 
 const AuthScreen = ({ setCookie }) => {
@@ -9,7 +9,8 @@ const AuthScreen = ({ setCookie }) => {
     const [message, setMessage] = useState(null);
     const [loggingIn, setLoggingIn] = useState(false);
     const [loading, setLoading] = useState(true);
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
+        e.preventDefault();
         if(username === ""){
             showMessage("Input Username");
         }else if(password === ""){
@@ -40,7 +41,7 @@ const AuthScreen = ({ setCookie }) => {
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
-        },1500)
+        },1000)
     },[]);
     if(loading){
         return (
@@ -52,12 +53,11 @@ const AuthScreen = ({ setCookie }) => {
             <Container maxWidth="sm" className="shadow-container">
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h4" component="h1" gutterBottom>
-                        Create User
+                        User Login
                     </Typography>
-                    <form onSubmit={handleLogin}>
+                    <form onSubmit={(e) => handleLogin(e)}>
                         <Grid container spacing={2}>
                             <Grid item container xs={12}>
-                                {/* <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}> */}
                                     <TextField
                                         fullWidth
                                         label="Username"
@@ -66,10 +66,8 @@ const AuthScreen = ({ setCookie }) => {
                                         onChange={(e) => setUsername(e.target.value)}
                                         type="text"
                                     />
-                                {/* </Grid> */}
                             </Grid>
                             <Grid item container xs={12}>
-                                {/* <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}> */}
                                     <TextField
                                         fullWidth
                                         label="Password"
@@ -78,43 +76,32 @@ const AuthScreen = ({ setCookie }) => {
                                         onChange={(e) => setPassword(e.target.value)}
                                         type="password"
                                     />
-                                {/* </Grid> */}
                             </Grid>
                             <Grid item xs={12}>
                                 <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    type="submit"
-                                >
-                                    LET ME IN
+                                        fullWidth
+                                        variant="contained"
+                                        color="primary"
+                                        type="submit"
+                                        disabled={loggingIn}
+                                    >
+                                        LET ME IN
                                 </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                                {
+                                    loggingIn ? <LinearProgress /> : null
+                                }
                             </Grid>
                         </Grid>
                     </form>
                 </Box>
-            </Container>
-            {/* <div className="login shadow-container">
-                <h1>Login</h1>
-                <form method="post">
-                    <input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} />
-                    <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>
+                <Container maxWidth="sm" className="warning-box">
                     {
-                        loggingIn ? <div style={{width:'100%',textAlign:'center'}}>
-                            <CircularProgress
-                                size={22}
-                            />
-                        </div> : <Button 
-                                    className="btn-block"
-                                    style={{backgroundColor:'#2196F3',color:'#FFF'}}
-                                    onClick={handleLogin}
-                                >Let Me In.</Button>
-                        }
-                    {
-                        message !== null ? <div className="error-msg">{message}</div> : message
+                        message !== null ? <Typography className="error">{message}</Typography> : null
                     }
-                </form>
-            </div> */}
+                </Container>
+            </Container>
         </div>
     )
 }

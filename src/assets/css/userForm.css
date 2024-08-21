@@ -1,3 +1,7 @@
+.add-users {
+    overflow: scroll;
+}
+
 .user-form {
     color: #FFF;
 }
