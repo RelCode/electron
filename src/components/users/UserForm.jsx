@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Button, Container, Box, Typography, Grid, TextField } from "@mui/material";
+import { Button, Container, Box, Typography, Grid, TextField, Select } from "@mui/material";
 import { useQuery } from "react-query";
 import axios from "axios";
+import './../../assets/css/userForm.css';
 
 const fetchUserTypes = async () => {
     const { data } = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/userTypes`);
@@ -20,9 +21,12 @@ const UserForm = ({ type }) => {
         }
     });
     const [formValues, setFormValues] = useState({
-        username: '',
         firstName: '',
         lastName: '',
+        userName: '',
+        userType: '',
+        password: '',
+        confirm: ''
     });
 
     const handleSubmit = (e) => {
@@ -31,36 +35,67 @@ const UserForm = ({ type }) => {
     };
     return (
         <>
-            <Container maxWidth="sm">
+            <Container maxWidth="sm" className="shadow-container">
                 <Box sx={{ mt: 4 }}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         Create User
                     </Typography>
                     <form onSubmit={handleSubmit}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Username"
-                                    name="username"
-                                    value={formValues.username}
-                                    onChange={(e) => setFormValues({ ...formValues, username: e.target.value })}
-                                    required
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Email"
-                                    name="email"
-                                    value={formValues.email}
-                                    onChange={(e) => setFormValues({ ...formValues, email: e.target.value })}
-                                    type="email"
-                                    required
-                                />
+                            <Grid item container xs={12}>
+                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
+                                    <TextField
+                                        fullWidth
+                                        label="First Name"
+                                        name="firstname"
+                                        value={formValues.firstName}
+                                        onChange={(e) => setFormValues({ ...formValues, firstName: e.target.value })}
+                                        type="text"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6} sx={{
+                                    mt: { xs: 2, md: 0 },
+                                    pl: { md: 1 }
+                                }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Last Name"
+                                        name="lastname"
+                                        value={formValues.lastName}
+                                        onChange={(e) => setFormValues({ ...formValues, lastName: e.target.value })}
+                                        type="text"
+                                    />
+                                </Grid>
                             </Grid>
                             <Grid item container xs={12}>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Username"
+                                        name="username"
+                                        value={formValues.userName}
+                                        onChange={(e) => setFormValues({ ...formValues, userName: e.target.value })}
+                                        type="text"
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6} sx={{
+                                    mt: { xs: 2, md: 0 },
+                                    pl: { md: 1 }
+                                }}>
+                                    <TextField
+                                        fullWidth
+                                        label="Select User Type"
+                                        name="password"
+                                        value={formValues.password}
+                                        onChange={(e) => setFormValues({ ...formValues, password: e.target.value })}
+                                        type="text"
+                                        required
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid item container xs={12}>
+                                <Grid item xs={12} md={6} sx={{ pr: { md: 1 } }}>
                                     <TextField
                                         fullWidth
                                         label="Create Password"
@@ -71,7 +106,10 @@ const UserForm = ({ type }) => {
                                         required
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6} sm={{ marginTop: 2 }}>
+                                <Grid item xs={12} md={6} sx={{ 
+                                    mt: { xs: 2, md: 0 },
+                                    pl: { md: 1 } 
+                                    }}>
                                     <TextField
                                         fullWidth
                                         label="Confirm Password"
