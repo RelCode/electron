@@ -8,17 +8,17 @@ const ViewUsers = () => {
     const [cookies] = useCookies(['sessionToken']);
     const [refreshUsers, setRefreshUsers] = useState(false);
     const fetchUsers = async () => {
-        const users = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/users`,{
-            headers: {
-                Authorization: `Bearer ${cookies?.sessionToken}`
-            }
-        }).then(response => {
-            console.log('SUCCESS',response);
-        }).catch(err => {
-            console.log('ERR: ', err);
-        }).finally(() => {
-            console.log('finished loading users');
-        });
+        try {
+            await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/users/all`, {
+                headers: {
+                    Authorization: `Bearer ${cookies.sessionToken}`
+                }
+            }).then(response => {
+                console.log('RESPONSE:::',response)
+            })
+        } catch (error) {
+            console.log('Error::', error);
+        }
     }
     useEffect(() => {
         fetchUsers();

@@ -63,7 +63,7 @@ router.post('/', (req, res) => {
                                     delete data.password;
                                     delete data.loginAttempts;
                                     const access_token = jwt.sign(data, process.env.SECRET_KEY, {
-                                        expiresIn: '8h'
+                                        expiresIn: (60 * 60 * 8)
                                     });
                                     res.status(200).json({ accessToken: access_token });
                                 }

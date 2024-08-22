@@ -7,7 +7,8 @@ import { jwtDecode } from "jwt-decode";
 import './../../assets/css/userForm.css';
 
 const fetchUserTypes = async () => {
-    const { data } = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/userTypes`);
+    const {data} = await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/userTypes`);
+    console.log('fetchUserTypes RES', data);
     return data;
 }
 
@@ -76,17 +77,23 @@ const UserForm = ({ type }) => {
                     Authorization: `Bearer ${cookies?.sessionToken}`
                 }
             }).then(response => {
-                console.log('RES:: ',response)
+                setStatus('success');
+                showMessage(response.data.message,() => {
+                    console.log('Callback');
+                    setStatus('error');
+                })
             }).catch(err => {
-                console.log('ERR:: ', err);
+                console.log(err);
+                // showMessage(err.response.data.message);
             })
         }
     };
 
-    const showMessage = (msg) => {
+    const showMessage = (msg, cb) => {
         setMessage(msg);
         setTimeout(() => {
             setMessage(null);
+            cb && cb();
         }, 3000);
     }
 
@@ -96,6 +103,7 @@ const UserForm = ({ type }) => {
     }
     useEffect(() => {
         decodeToken();
+        // testGet();
     },[]);
     return (
         <>

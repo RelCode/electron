@@ -15,7 +15,7 @@ async function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
   });
 
   mainWindow.loadURL(
