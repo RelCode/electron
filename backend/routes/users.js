@@ -8,11 +8,11 @@ const verifyToken = require('./../util/middleware');
 
 // Endpoint to get all (ACTIVE) users
 router.get('/all', verifyToken, (req, res) => {
-	db.get(`SELECT * FROM users WHERE active = ?`, [keywords.active], (err, rows) => {
+	db.all(`SELECT * FROM users WHERE active = ?`, [keywords.active], (err, rows) => {
 		if (err) {
 			return res.status(301).json({ message: 'Failed to Fetch Requested Data' });
 		} else {
-			// console.log('selectedUsers', rows);
+			console.log('selectedUsers', rows);
 			return res.status(200).json({ users: rows });
 		}
 	})
@@ -23,7 +23,6 @@ router.post('/create', verifyToken, (req, res) => {
 	console.log('payload!!!', payload);
 	db.get(`SELECT * FROM loginDetails WHERE username = ?`,[payload.userName],(err, rows) => {
 		if(err){
-			console.log('26', err);
 			return res.status(500).json({ message: keywords.dbError })
 		}
 		if(typeof rows === 'object'){
@@ -31,7 +30,6 @@ router.post('/create', verifyToken, (req, res) => {
 		}
 		db.get(`SELECT * FROM userTypes WHERE typeID = ?`, [payload.userType], (err, rows) => {
 			if (err) {
-				console.log('34', err);
 				return res.status(500).json({ message: keywords.dbError });
 			}
 			if (typeof rows === undefined) {

@@ -3,7 +3,6 @@ const keywords = require('./keywords');
 
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization');
-    console.log('TOKEN', token)
     if (!token) {
         return res.status(401).json({ message: keywords.noToken });
     }

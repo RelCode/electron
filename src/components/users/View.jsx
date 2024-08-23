@@ -3,27 +3,20 @@ import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import { UserProvider ,useUserContext } from "./UserContext";
 
 const ViewUsers = () => {
     const [cookies] = useCookies(['sessionToken']);
+    const { data, loading, error } = useUserContext();
     const [refreshUsers, setRefreshUsers] = useState(false);
     const fetchUsers = async () => {
-        try {
-            await axios.get(`${process.env.REACT_APP_API_ENDPOINT}/users/all`, {
-                headers: {
-                    Authorization: `Bearer ${cookies.sessionToken}`
-                }
-            }).then(response => {
-                console.log('RESPONSE:::',response)
-            })
-        } catch (error) {
-            console.log('Error::', error);
-        }
+
     }
     useEffect(() => {
         fetchUsers();
     },[refreshUsers]);
     return (
+        <UserProvider token={cookies?.sessionToken}>
         <div className="component users-container">
             <div>
                 <Button 
@@ -33,6 +26,7 @@ const ViewUsers = () => {
                 >Add User</Button>
             </div>
         </div>
+        </UserProvider>
     )
 }
 

@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { jwtDecode } from "jwt-decode";
+import { useUserContext } from "./UserContext";
 import './../../assets/css/userForm.css';
 
 const fetchUserTypes = async () => {
@@ -12,8 +13,20 @@ const fetchUserTypes = async () => {
     return data;
 }
 
+const defaultValues = () => {
+    return {
+        firstName: '',
+        lastName: '',
+        userName: '',
+        userType: 0,
+        password: '',
+        confirm: ''
+    }
+}
+
 const UserForm = ({ type }) => {
     const [cookies] = useCookies(['sessionToken']);
+    const {toggleReload} = useUserContext();
     const [user, setUser] = useState({});
     const { data, isLoading, error } = useQuery('userTypes', fetchUserTypes, {
         initialData: () => {
@@ -25,14 +38,7 @@ const UserForm = ({ type }) => {
             }
         }
     });
-    const [formValues, setFormValues] = useState({
-        firstName: '',
-        lastName: '',
-        userName: '',
-        userType: 0,
-        password: '',
-        confirm: ''
-    });
+    const [formValues, setFormValues] = useState(defaultValues());
     const [message, setMessage] = useState(null);
     const [status, setStatus] = useState('error');
 
@@ -70,22 +76,25 @@ const UserForm = ({ type }) => {
         } else if (formValues.password.toLowerCase() !== formValues.confirm.toLowerCase()) {
             showMessage("Passwords Provided Should Match");
         }else{
-            await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/users/create`, {
-                payload: formValues
-            }, {
-                headers: {
-                    Authorization: `Bearer ${cookies?.sessionToken}`
-                }
-            }).then(response => {
-                setStatus('success');
-                showMessage(response.data.message,() => {
-                    console.log('Callback');
-                    setStatus('error');
+            try {
+                await axios.post(`${process.env.REACT_APP_API_ENDPOINT}/users/create`, {
+                    payload: formValues
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${cookies?.sessionToken}`
+                    }
+                }).then(response => {
+                    setFormValues(defaultValues)
+                    setStatus('success');
+                    toggleReload();
+                    showMessage(response.data.message, () => {
+                        setStatus('error');
+                    })
                 })
-            }).catch(err => {
-                console.log(err);
-                // showMessage(err.response.data.message);
-            })
+            }catch ({response}){
+                showMessage(response.data.message)
+                console.log('CreatingError', response.data.message);
+            }
         }
     };
 
@@ -149,7 +158,7 @@ const UserForm = ({ type }) => {
                                         label="Username"
                                         name="username"
                                         value={formValues.userName}
-                                        onChange={(e) => setFormValues({ ...formValues, userName: e.target.value })}
+                                        onChange={(e) => setFormValues({ ...formValues, userName: e.target.value.toLowerCase() })}
                                         type="text"
                                         
                                     />
